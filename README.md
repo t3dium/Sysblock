@@ -1,7 +1,8 @@
 # Sysblock
-
 A systemwide ad/tracker/malware/crypto blocker for windows and linux. 
 _In other words: A sophisticated application decrapifier._
+
+**Note that this is a work in progress and not yet finished**
 
 ## Features
 **Convenience**
