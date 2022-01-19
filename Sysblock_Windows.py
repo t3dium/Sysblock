@@ -7,8 +7,8 @@ import requests
 
 
 #some variables
-host_path = r"C:\Users\Computer\Documents\test.txt"  # - Ignore this, its used for testing the program
-# host_path = r"C:\Windows\System32\drivers\etc\hosts"
+# host_path = r"C:\Users\Computer\Documents\test.txt"  # - Ignore this, its used for testing the program
+host_path = r"C:\Windows\System32\drivers\etc\hosts"
 
 
 def undo():
@@ -136,9 +136,12 @@ def apply_blocklist():
              !!! IMPORTANT: if you wish to whitelist a site, re-run this script but with option 3""")
 
 #DOWNLOADING THE USER SELECTED blocklist
+
+
 def downloading():
     global url
     #rather than constantly repeating this, this function will be called back with a custom variable.
+
     def download_blocklist():
         myfile = requests.get(url)
         open((blocklist), 'wb').write(myfile.content)
