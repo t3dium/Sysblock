@@ -7,14 +7,36 @@ import requests
 
 
 #some variables
-# host_path = r"C:\Users\Computer\Documents\test.txt" - Ignore this, its used for testing the program
-host_path = r"C:\Windows\System32\drivers\etc\hosts"
+host_path = r"C:\Users\Computer\Documents\test.txt"  # - Ignore this, its used for testing the program
+# host_path = r"C:\Windows\System32\drivers\etc\hosts"
 
 
 def undo():
     with open(host_path, 'w') as undo:
-        undo.write("")
+        undo.write("""
+# Copyright (c) 1993-2009 Microsoft Corp.
+#
+# This is a sample HOSTS file used by Microsoft TCP/IP for Windows.
+#
+# This file contains the mappings of IP addresses to host names. Each
+# entry should be kept on an individual line. The IP address should
+# be placed in the first column followed by the corresponding host name.
+# The IP address and the host name should be separated by at least one
+# space.
+#
+# Additionally, comments (such as these) may be inserted on individual
+# lines or following the machine name denoted by a '#' symbol.
+#
+# For example:
+#
+#      102.54.94.97     rhino.acme.com          # source server
+#       38.25.63.10     x.acme.com              # x client host
+
+# localhost name resolution is handled within DNS itself.
+#	127.0.0.1       localhost
+#	::1             localhost""")
         #removes all text and writes nothing
+        print("finished, you may now close this program")
 
 
 def custom_redirects():
@@ -39,11 +61,11 @@ def custom_redirects():
 #     f.close()
 
     ###
-    if run_once_or_multiple == ("Y"):
-        print("repeating..")
-        whitelist_apply()
-    else:
-        quit()
+    # if run_once_or_multiple == ("Y"):
+    #     print("repeating..")
+    #     whitelist_apply()
+    # else:
+    #     quit()
 
 
 # def whitelist():
@@ -114,12 +136,10 @@ def apply_blocklist():
              !!! IMPORTANT: if you wish to whitelist a site, re-run this script but with option 3""")
 
 #DOWNLOADING THE USER SELECTED blocklist
-
-
 def downloading():
+    global url
     #rather than constantly repeating this, this function will be called back with a custom variable.
     def download_blocklist():
-        url = 'https://dbl.oisd.nl/basic/'
         myfile = requests.get(url)
         open((blocklist), 'wb').write(myfile.content)
         print(" Downloaded")
@@ -128,16 +148,21 @@ def downloading():
     global blocklist
     if blocklist_choice == ("Full"):
         blocklist = ("oisd_full.txt")
+        url = 'https://dbl.oisd.nl/'
         download_blocklist()
 
     elif blocklist_choice == ("Lightweight"):
         print(Fore.WHITE, "Downloading Lightweight blocklist...")
         blocklist = ("oisd_basic.txt")
+        url = 'https://dbl.oisd.nl/basic/'
         download_blocklist()
 
     elif blocklist_choice == ("Custom"):
         print("Please enter a blocklist url,", Fore.RED, "note that this must be a DOMAIN/Hosts blocklist.", Fore.LIGHTMAGENTA_EX, "You can find some at filterlists.com")
-        custom_blocklist_url = input("--->   ")
+        url = input("--->   ")
+        blocklist = ("custom_blocklist.txt")
+        download_blocklist()
+
     else:
         print(Fore.RED, "Incorrect option, returning to menu")
         sleep(0.4)
@@ -145,13 +170,13 @@ def downloading():
 
 
 def menu():
-    print(Fore.LIGHTGREEN_EX, """
+    print(Fore.YELLOW, """
          █████╗ ██████╗ ██████╗ ██╗      ██████╗  ██████╗██╗  ██╗
         ██╔══██╗██╔══██╗██╔══██╗██║     ██╔═══██╗██╔════╝██║ ██╔╝
         ███████║██║  ██║██████╔╝██║     ██║   ██║██║     █████╔╝
         ██╔══██║██║  ██║██╔══██╗██║     ██║   ██║██║     ██╔═██╗
         ██║  ██║██████╔╝██████╔╝███████╗╚██████╔╝╚██████╗██║  ██╗
-        ╚═╝  ╚═╝╚═════╝ ╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝
+        ╚═╝  ╚═╝╚═════╝ ╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝""", Fore.GREEN, """
         Sysblock, an ad/tracker/malware/crypto blocker
 
         ---------------------------------
@@ -169,7 +194,7 @@ def menu():
         -------------------------------------------------------------
         █████████████████████████████████████████████████████████████
         -------------------------------------------------------------
-        5) UNDO ANY CHANGES - Coming Soon
+        5) UNDO ANY CHANGES
         -------------------------------------------------------------
         █████████████████████████████████████████████████████████████
         -------------------------------------------------------------
