@@ -10,7 +10,7 @@ Every os has a host file which was used to map ip's with their correlating domai
 
 * [x] Windows support
 * [ ] Linux support
-* [x] whitelisting capability
+* [ ] whitelisting capability
 * [x] blacklisting capability
 * [x] custom redirects
 * [x] Download via url
