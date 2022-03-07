@@ -9,7 +9,7 @@ Every os has a host file which was used to map ip's with their correlating domai
 ### Todo:
 
 * [x] Windows support
-* [ ] Linux support
+* [x] Linux support
 * [ ] whitelisting capability
 * [x] blacklisting capability
 * [x] custom redirects
@@ -19,5 +19,3 @@ Every os has a host file which was used to map ip's with their correlating domai
 
 * As with any hosts/dns based adblock, whilst useful for being system wide, it wont have as complex rules as html filtering browser based extensions as it solely uses domains. For best results, you can combine sysblock with the ublock origin extension
 * It cannot block youtube ads, you may want to use invidious for this.
-
-Also colours wont display when compiling python code into an exe, which is strange
