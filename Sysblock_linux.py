@@ -35,24 +35,11 @@ ff02::2    ip6-allrouters
         print("finished, you may now close this program")
 
 
-def custom_redirect_repeat():
-    print("Enter", Fore.CYAN, "Y", Fore.WHITE, "if you would like to redirect more than domain, else",
-          Fore.RED, "N", Fore.WHITE, "to run once")
-    global run_once_or_multiple4
-    run_once_or_multiple4 = input("--> ")
-    run_once_or_multiple4 = run_once_or_multiple4.lower()
-    custom_redirects()
-
-
 def custom_redirects():
-    global domain, redirect, custom_redirect
     domain = input("Enter the domain you want to be redirected")
     redirect = input("What domain would you like to redirect it to:")
     custom_redirect = (redirect+" "+domain)
-    apply_custom_redirects()
 
-
-def apply_custom_redirects():
     with open(host_path, 'a') as host2:
         host2.write(custom_redirect)
         host2.write("\n")
@@ -61,75 +48,89 @@ def apply_custom_redirects():
               domain, " --> ", redirect)
         print(Fore.WHITE)
     ##repeating##
-    if run_once_or_multiple4 == ("y"):
-        print("repeating..")
+    table3 = Table()
+
+    table3.add_column("Keybinding", justify="left",
+                      style="magenta", no_wrap=True)
+    table3.add_column("Options", justify="left", style="cyan")
+    table3.add_row("1", "Whitelist another domain")
+    table3.add_row("2", "Return to Menu",)
+
+    console3 = Console()
+    console3.print(table3)
+
+    menu_choice3 = input("")
+    if menu_choice3 == ("1"):
         custom_redirects()
     else:
-        quit()
-
-# def whitelist_apply():
-#     print("Enter the domain you want to whitelist", Fore.RED, "Note that domains do not include https:// nor bits after the slash", Fore.CYAN, "for e.g google.com")
-#     excludedWord = input("--->  ")
-#
-#     try:
-#         with open(host_path, 'r') as fr:
-#             lines = fr.readlines()
-#
-#             with open(host_path, 'w') as fw:
-#                 for line in lines:
-#                     # strip() is used to remove '\n'
-#                     # present at the end of each line
-#                     if line.strip('\n') != '8-August':
-#                         fw.write(line)
-#         print("Finished")
-#     except:
-#         print("Error")
-#     ##
-#     if run_once_or_multiple == ("Y"):
-#         print("repeating..")
-#         whitelist_apply()
-#     else:
-#         quit()
-#
-#
-# def whitelist():
-#     #if the user wants to whitelist multiple domains, this definition will loop
-#     print("Enter", Fore.CYAN, "Y", Fore.WHITE, "if you would like to whitelist more than domain, else", Fore.RED, "N", Fore.WHITE, "to run once")
-#     global run_once_or_multiple
-#     run_once_or_multiple = input("--> ")
-#     whitelist_apply()
+        menu()
 
 
-def blacklist_apply():
+def whitelist():
+    print("Enter the domain you want to whitelist", Fore.RED,
+          "Note that domains do not include https:// nor bits after the slash", Fore.CYAN, "for e.g google.com")
+    excludedWord = input("--->  ")
+
+    with open(host_path, "r+") as f:
+        new_f = f.readlines()
+        f.seek(0)
+        for line in new_f:
+            if (excludedWord) not in line:
+                f.write(line)
+        f.truncate()
+    ##
+    table2 = Table()
+
+    table2.add_column("Keybinding", justify="left",
+                      style="magenta", no_wrap=True)
+    table2.add_column("Options", justify="left", style="cyan")
+    table2.add_row("1", "Whitelist another domain")
+    table2.add_row("2", "Return to Menu",)
+
+    console2 = Console()
+    console2.print(table2)
+
+    menu_choice2 = input("")
+    if menu_choice2 == ("1"):
+        whitelist()
+    else:
+        menu()
+
+
+def blacklist():
     print(Fore.CYAN, " Enter the domain you want blacklisted.", Fore.RED,
           "Do not include https, or bits after the slash.", Fore.CYAN, "An example looks like this: google.com")
     url_to_blacklist = input("--->  ")
-    thing = ((url_to_blacklist) + (" 0.0.0.0") + '\n')
+    thing = (("0.0.0.0 ") + (url_to_blacklist) + '\n')
     with open(host_path, 'a') as host_file:
         host_file.write(thing)
-    if run_once_or_multiple2 == ("y"):
-        print("repeating..")
-        blacklist_apply()
+    ##
+    table1 = Table()
+    table1.add_column("Keybinding", justify="left",
+                      style="magenta", no_wrap=True)
+    table1.add_column("Options", justify="left", style="cyan")
+    table1.add_row("1", "Blacklist another domain")
+    table1.add_row("2", "Return to Menu",)
+
+    console1 = Console()
+    console1.print(table1)
+
+    menu_choice2 = input("")
+    if menu_choice2 == ("1"):
+        blacklist()
     else:
-        quit()
-
-
-def blacklisting():
-    print("Enter", Fore.CYAN, "Y", Fore.WHITE, "if you would like to blacklist more than domain, else",
-          Fore.RED, "N", Fore.WHITE, "to run once")
-    global run_once_or_multiple2
-    run_once_or_multiple2 = input("--> ")
-    run_once_or_multiple2 = run_once_or_multiple2.lower()
-    blacklist_apply()
+        menu()
 
 
 def cleanup():
-    #removing unecessary comments from hosts
-    with open(host_path, "r") as file:
-        for line in file:
-            if line.startswith('#'):
-                continue
-            line = line.strip()
+    #removing unecessary comments from file
+    with open(host_path, "r+") as f:
+        new_f = f.readlines()
+        f.seek(0)
+        for line in new_f:
+            if ("#") not in line:
+                f.write(line)
+        f.truncate()
 
 
 def apply_blocklist():
@@ -248,16 +249,19 @@ By t3dium
 What would you like to do?""")
 
     table.add_column("Options", justify="left", style="cyan", no_wrap=True)
-    table.add_column("Blocklist", justify="left", style="magenta")
-    table.add_column("Info", justify="left", style="green")
+    table.add_column("Info", justify="left", style="magenta")
+    table.add_column("More Info", justify="left", style="green")
 
     table.add_row("1", "Apply Adblock",
                   "Will be prompted to choose blocklists afterwards")
     table.add_row(" ", " ", " ")
     table.add_row("2", "Whitelisting", "Coming Soon...")
     table.add_row("3", "Blacklisting", "Block Specific Domains")
+    table.add_row("4", "Custom Redirects", "Typically used for lan services")
+    table.add_row("5", "Cleanup blocklists",
+                  "removes unecessary comment lines")
     table.add_row(" ", " ", " ")
-    table.add_row("4", "UNDO ALL CHANGES",
+    table.add_row("6", "UNDO ALL CHANGES",
                   "sets hosts back to normal")
 
     console = Console()
@@ -274,12 +278,15 @@ What would you like to do?""")
         whitelist()
 
     elif choice == ("3"):
-        blacklisting()
+        blacklist()
 
     elif choice == ("4"):
-        custom_redirect_repeat()
+        custom_redirects()
 
     elif choice == ("5"):
+        cleanup()
+
+    elif choice == ("6"):
         print(Fore.RED)
         continue1 = input(
             "Are you sure? Enter Y to undo any changes and remove all filters.")
