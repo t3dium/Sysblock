@@ -2,21 +2,21 @@
 from colorama import init
 from colorama import Fore
 from datetime import *
-from time import *
 import subprocess
 import requests
 import os
 import sys
 import syslog
+import time
+#for tables
+from rich.console import Console
+from rich.table import Table
 
 #Check for root
 if not os.geteuid() == 0:
     sys.exit("\nYou must have root privilages to run sysblock, re-run the command: sudo python3 sysblock, make sure you use sudo.\n")
 
-#some variables
-# - Ignore this, its used for testing the program
 host_path = r'/etc/hosts'
-# host_path = r"C:\Windows\System32\drivers\etc\hosts"
 
 
 def undo():
@@ -71,27 +71,27 @@ def apply_custom_redirects():
 #     print("Enter the domain you want to whitelist", Fore.RED, "Note that domains do not include https:// nor bits after the slash", Fore.CYAN, "for e.g google.com")
 #     excludedWord = input("--->  ")
 #
-#     f = open(host_path, 'r')
-#     lines = f.readlines()
-#     f.close()
+#     try:
+#         with open(host_path, 'r') as fr:
+#             lines = fr.readlines()
 #
-#     newLines = []
-#     for line in lines:
-#         newLines.append(' '.join([word for word in line.split() if word != excludedWord]))
+#             with open(host_path, 'w') as fw:
+#                 for line in lines:
+#                     # strip() is used to remove '\n'
+#                     # present at the end of each line
+#                     if line.strip('\n') != '8-August':
+#                         fw.write(line)
+#         print("Finished")
+#     except:
+#         print("Error")
+#     ##
+#     if run_once_or_multiple == ("Y"):
+#         print("repeating..")
+#         whitelist_apply()
+#     else:
+#         quit()
 #
-#     f = open(host_path, 'w')
-#     for line in lines:
-#         f.write("{}\n".format(line))
-#     f.close()
-
-    ###
-    # if run_once_or_multiple == ("Y"):
-    #     print("repeating..")
-    #     whitelist_apply()
-    # else:
-    #     quit()
-
-
+#
 # def whitelist():
 #     #if the user wants to whitelist multiple domains, this definition will loop
 #     print("Enter", Fore.CYAN, "Y", Fore.WHITE, "if you would like to whitelist more than domain, else", Fore.RED, "N", Fore.WHITE, "to run once")
@@ -123,6 +123,15 @@ def blacklisting():
     blacklist_apply()
 
 
+def cleanup():
+    #removing unecessary comments from hosts
+    with open(host_path, "r") as file:
+        for line in file:
+            if line.startswith('#'):
+                continue
+            line = line.strip()
+
+
 def apply_blocklist():
     print(" Applying...")
 
@@ -131,7 +140,7 @@ def apply_blocklist():
         return(lines)
 
     #PROCESSING THE USER SELECTED BLOCKLIST
-    row = lines(blocklist)
+    row = lines("blocklist.txt")
     websites = row
 
     print(Fore.WHITE, "Please wait for a minute or two", Fore.RED,
@@ -161,6 +170,7 @@ def apply_blocklist():
              try visiting a website usually filled with ads and test if it worked
 
              !!! IMPORTANT: if you wish to whitelist a site, re-run this script but with option 3""")
+    cleanup()
 
 
 #DOWNLOADING THE USER SELECTED blocklist
@@ -169,75 +179,96 @@ def downloading():
 
     def download_blocklist():
         myfile = requests.get(url)
-        open((blocklist), 'wb').write(myfile.content)
-        print(" Downloaded")
-        apply_blocklist()
+        open(("blocklist.txt"), 'ab').write(myfile.content)
+        print(" Downloaded blocklists...")
+        # apply_blocklist()
 
-    global blocklist
-    if blocklist_choice.lower() == ("full"):
-        blocklist = ("oisd_full.txt")
+    blocklist_choice_final = blocklist_choice.split(',')
+    print(blocklist_choice_final)
+    if "1" in blocklist_choice_final:
         url = 'https://dbl.oisd.nl/'
         download_blocklist()
-
-    elif blocklist_choice.lower() == ("lightweight"):
-        print(Fore.WHITE, "Downloading Lightweight blocklist...")
-        blocklist = ("oisd_basic.txt")
+    if "2" in blocklist_choice_final:
         url = 'https://dbl.oisd.nl/basic/'
         download_blocklist()
-
-    elif blocklist_choice.lower() == ("custom"):
+    if "3" in blocklist_choice_final:
         print("Please enter a blocklist url,", Fore.RED, "note that this must be a DOMAIN/Hosts blocklist.",
               Fore.LIGHTMAGENTA_EX, "You can find some at filterlists.com")
         url = input("--->   ")
-        blocklist = ("custom_blocklist.txt")
         download_blocklist()
+    if "4" in blocklist_choice_final:
+        url = 'https://raw.githubusercontent.com/furkun/ProtectorHosts/main/hosts'
+        download_blocklist()
+    if "5" in blocklist_choice_final:
+        url = 'https://raw.githubusercontent.com/anudeepND/blacklist/master/facebook.txt'
+        download_blocklist()
+    # if "6" in blocklist_choice_final:
+    #
+    # if "7" in blocklist_choice_final:
 
-    else:
-        print(Fore.RED, "Incorrect option, returning to menu")
-        sleep(0.4)
-        menu()
+
+def choose_blocklist():
+    #using rich for tables here
+    global blocklist_choice
+    table = Table(title="Sysblock -  Choose Blocklists")
+    table.add_column("Options", justify="left", style="cyan", no_wrap=True)
+    table.add_column("Blocklist", justify="left", style="magenta")
+    table.add_column("Info", justify="left", style="green")
+
+    table.add_row("1", "Oisd Full", "Main - Recommended")
+    table.add_row("2", "Oisd Lightweight", "Main - For low end devices")
+    table.add_row("3", "Custom", "Enter the Url")
+    table.add_row(" ", " ", " ")
+    table.add_row("* 4", "IpGrabber Blocklist", "Extra - Blocks Ip Grabbers")
+    table.add_row("* 5", "No Facebook",
+                  "Extra - Blocks facebook + trackers completely")
+    table.add_row(" ", " ", " ")
+    table.add_row("n/a", "More coming soon",
+                  "")
+
+    console = Console()
+    console.print(table)
+    print(Fore.RED, "NOTE: enter your choices in the FOLLOWING FORMAT: 1,2,5 with the COMMAS if theres multiple")
+    blocklist_choice = input("")
+    downloading()
 
 
 def menu():
-    print(Fore.YELLOW, """
-         █████╗ ██████╗ ██████╗ ██╗      ██████╗  ██████╗██╗  ██╗
-        ██╔══██╗██╔══██╗██╔══██╗██║     ██╔═══██╗██╔════╝██║ ██╔╝
-        ███████║██║  ██║██████╔╝██║     ██║   ██║██║     █████╔╝
-        ██╔══██║██║  ██║██╔══██╗██║     ██║   ██║██║     ██╔═██╗
-        ██║  ██║██████╔╝██████╔╝███████╗╚██████╔╝╚██████╗██║  ██╗
-        ╚═╝  ╚═╝╚═════╝ ╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝""", Fore.GREEN, """
-        Sysblock, an ad/tracker/malware/crypto blocker
+    print(Fore.YELLOW, "")
 
-        ---------------------------------
-        What would you like to do?
-        ---------------------------------
-        ████████████████████████████████████████████████████████████
-        -------------------------------------------------------------
-        1) Apply Adblock
-        -------------------------------------------------------------
-        ████████████████████████████████████████████████████████████
-        -------------------------------------------------------------
-        2) Whitelisting - Coming Soon
-        3) Blacklisting
-        4) Custom Redirects
-        -------------------------------------------------------------
-        █████████████████████████████████████████████████████████████
-        -------------------------------------------------------------
-        5) UNDO ANY CHANGES
-        -------------------------------------------------------------
-        █████████████████████████████████████████████████████████████
-        -------------------------------------------------------------
+    table = Table(title="""
+ █████╗ ██████╗ ██████╗ ██╗      ██████╗  ██████╗██╗  ██╗
+██╔══██╗██╔══██╗██╔══██╗██║     ██╔═══██╗██╔════╝██║ ██╔╝
+███████║██║  ██║██████╔╝██║     ██║   ██║██║     █████╔╝
+██╔══██║██║  ██║██╔══██╗██║     ██║   ██║██║     ██╔═██╗
+██║  ██║██████╔╝██████╔╝███████╗╚██████╔╝╚██████╗██║  ██╗
+╚═╝  ╚═╝╚═════╝ ╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝
+By t3dium
 
-        """)
+What would you like to do?""")
+
+    table.add_column("Options", justify="left", style="cyan", no_wrap=True)
+    table.add_column("Blocklist", justify="left", style="magenta")
+    table.add_column("Info", justify="left", style="green")
+
+    table.add_row("1", "Apply Adblock",
+                  "Will be prompted to choose blocklists afterwards")
+    table.add_row(" ", " ", " ")
+    table.add_row("2", "Whitelisting", "Coming Soon...")
+    table.add_row("3", "Blacklisting", "Block Specific Domains")
+    table.add_row(" ", " ", " ")
+    table.add_row("4", "UNDO ALL CHANGES",
+                  "sets hosts back to normal")
+
+    console = Console()
+    console.print(table)
+
     choice = input("  Choose an option, 1 is the default.")
     if choice == ("1"):
 
         #LETTING THE USER CHOOSE A blocklist
         print(Fore.LIGHTMAGENTA_EX)
-        global blocklist_choice
-        blocklist_choice = input(
-            " Please choose a blocklist: Full, or Lightweight (for lower end devices)")
-        downloading()
+        choose_blocklist()
 
     elif choice == ("2"):
         whitelist()
@@ -261,4 +292,6 @@ def menu():
         print(Fore.RED, "Please select an option, Returning to Menu")
         sleep(0.4)
         menu()
+
+
 menu()
