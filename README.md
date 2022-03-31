@@ -6,7 +6,7 @@ _In other words: A sophisticated application decrapifier._
 
 Every os has a host file which was used to map ip's with their correlating domain, this was mainly used before dns was introduced, because host comes before the dns, it can make for a great systemwide content blocker which for e.g, instead of correlating ad.com with its ip it'd be correlated with a "dummy ip" such as 0.0.0.0 which wont load the domain. Which is the purpose of sysblock, a sophisticated yet easy to use tool to manage your host file as an content blocker.
 
-### Todo:
+### Features
 
 * [x] Windows support
 * [x] Linux support
@@ -14,6 +14,13 @@ Every os has a host file which was used to map ip's with their correlating domai
 * [x] blacklisting capability
 * [x] custom redirects
 * [x] Download via url
+* [x] List of blocklists, ability to choose multiple
+* [x] Domains are deduplicated at the end (currently only on linux version)
+
+## Requirements
+- ``pip install rich``
+- ``pip install colorama``
+- ``pip install requests`` (might already be installed)
 
 ## Limitations
 
