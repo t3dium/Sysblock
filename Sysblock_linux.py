@@ -21,8 +21,7 @@ host_path = r'/etc/hosts'
 
 def undo():
     print("test")
-    sample = ("""
-# Host addresses
+    sample = ("""# Host addresses
 127.0.0.1  localhost
 127.0.1.1  computer
 ::1        localhost ip6-localhost ip6-loopback
@@ -166,7 +165,7 @@ def apply_blocklist():
                     file.write(line)
             file.truncate()
 
-    sleep(5)
+    time.sleep(5)
     print(Fore.YELLOW, """Sysblock has been applied succesfully,
              try visiting a website usually filled with ads and test if it worked
 
@@ -297,7 +296,7 @@ What would you like to do?""")
 
     else:
         print(Fore.RED, "Please select an option, Returning to Menu")
-        sleep(0.4)
+        time.sleep(0.4)
         menu()
 
 
