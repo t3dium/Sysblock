@@ -12,25 +12,35 @@ import time
 from rich.console import Console
 from rich.table import Table
 
-#Check for root
-if not os.geteuid() == 0:
-    sys.exit("\nYou must have root privilages to run sysblock, re-run the command: sudo python3 sysblock, make sure you use sudo.\n")
-
-host_path = r'/etc/hosts'
+#some variables
+# host_path = r"C:\Users\Computer\Documents\test.txt"  # - Ignore this, its used for testing the program
+host_path = r"C:\Windows\System32\drivers\etc\hosts"
 
 
 def undo():
-    print("test")
-    sample = ("""# Host addresses
-127.0.0.1  localhost
-127.0.1.1  computer
-::1        localhost ip6-localhost ip6-loopback
-ff02::1    ip6-allnodes
-ff02::2    ip6-allrouters
-
-    """)
     with open(host_path, 'w') as undo:
-        undo.write(sample)
+        undo.write("""
+# Copyright (c) 1993-2009 Microsoft Corp.
+#
+# This is a sample HOSTS file used by Microsoft TCP/IP for Windows.
+#
+# This file contains the mappings of IP addresses to host names. Each
+# entry should be kept on an individual line. The IP address should
+# be placed in the first column followed by the corresponding host name.
+# The IP address and the host name should be separated by at least one
+# space.
+#
+# Additionally, comments (such as these) may be inserted on individual
+# lines or following the machine name denoted by a '#' symbol.
+#
+# For example:
+#
+#      102.54.94.97     rhino.acme.com          # source server
+#       38.25.63.10     x.acme.com              # x client host
+# localhost name resolution is handled within DNS itself.
+#	127.0.0.1       localhost
+#	::1             localhost""")
+        #removes all text and writes nothing
         print("finished, you may now close this program")
 
 
